@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NagrikVaani Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0d2d5e;--blue:#1565C0;--accent:#e65100;--gold:#f9a825;--green:#2e7d32;--red:#c62828;--bg:#f4f6fb;--surface:#fff;--border:#dde3f0;--text:#0d1b2e;--muted:#5a6a85;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy),var(--blue));}
+.login-box{background:#fff;border-radius:20px;padding:40px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.login-logo{text-align:center;font-size:40px;margin-bottom:12px;}
+.login-box h2{font-family:'Playfair Display',serif;font-size:22px;color:var(--navy);text-align:center;margin-bottom:4px;}
+.login-box p{font-size:12px;color:var(--muted);text-align:center;margin-bottom:28px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;border:1.5px solid var(--border);background:#f8faff;padding:11px 14px;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border 0.2s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);background:#fff;}
+.field textarea{resize:vertical;min-height:80px;}
+.btn{width:100%;background:var(--navy);color:#fff;border:none;padding:13px;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
+.btn:hover{background:#1a4080;}
+.btn:disabled{opacity:0.6;cursor:not-allowed;}
+.error-msg{background:#fff0f0;border:1px solid #ffcdd2;color:var(--red);padding:10px;border-radius:8px;font-size:12px;margin-top:10px;display:none;text-align:center;}
+.hint{font-size:11px;color:var(--muted);text-align:center;margin-top:14px;}
+.admin-wrap{display:none;}
+.topbar{background:var(--navy);color:rgba(255,255,255,0.7);font-size:11px;padding:5px 24px;border-bottom:3px solid var(--gold);display:flex;justify-content:space-between;}
+.navbar{background:#fff;border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:62px;}
+.brand{font-family:'Playfair Display',serif;font-size:20px;color:var(--navy);}
+.brand span{color:var(--accent);}
+.abadge{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.nav-right{display:flex;gap:10px;align-items:center;}
+.nav-right a{text-decoration:none;font-size:12px;font-weight:600;color:var(--navy);border:1.5px solid var(--border);padding:6px 14px;border-radius:8px;}
+.btn-logout{background:none;border:1.5px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;}
+.layout{display:flex;min-height:calc(100vh - 90px);}
+.sidebar{width:200px;background:#fff;border-right:1px solid var(--border);padding:16px 0;flex-shrink:0;}
+.sb-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:8px 16px 4px;}
+.sb-item{display:flex;align-items:center;gap:8px;padding:9px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;background:none;border:none;width:100%;font-family:'Plus Jakarta Sans',sans-serif;transition:all 0.2s;}
+.sb-item:hover{background:var(--bg);color:var(--navy);}
+.sb-item.active{background:rgba(21,101,192,0.09);color:var(--blue);font-weight:700;border-right:3px solid var(--blue);}
+.main{flex:1;padding:24px;}
+.page{display:none;}
+.page.active{display:block;}
+.page-head{margin-bottom:20px;}
+.page-head h2{font-family:'Playfair Display',serif;font-size:20px;color:var(--navy);}
+.page-head p{font-size:12px;color:var(--muted);margin-top:3px;}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:24px;}
+.stat{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;border-top:3px solid var(--blue);}
+.stat.orange{border-top-color:var(--accent);}
+.stat.green{border-top-color:var(--green);}
+.stat.gold{border-top-color:var(--gold);}
+.stat.red{border-top-color:var(--red);}
+.stat-num{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--navy);}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:4px;font-weight:500;}
+.tbl-wrap{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.tbl-wrap table{width:100%;border-collapse:collapse;font-size:12px;}
+.tbl-wrap thead{background:linear-gradient(90deg,var(--navy),var(--blue));}
+.tbl-wrap th{padding:11px 14px;text-align:left;color:#fff;font-weight:600;font-size:11px;white-space:nowrap;}
+.tbl-wrap td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.tbl-wrap tr:last-child td{border-bottom:none;}
+.tbl-wrap tr:hover td{background:#f8faff;}
+.cid{color:var(--blue);font-weight:700;cursor:pointer;font-family:monospace;}
+.cid:hover{text-decoration:underline;}
+.bs{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;}
+.s-open{background:#e3f2fd;color:#1565C0;}
+.s-prog{background:#fff3e0;color:#e65100;}
+.s-res{background:#e8f5e9;color:#2e7d32;}
+.s-rej{background:#ffebee;color:#c62828;}
+.ph{background:#ffebee;color:#c62828;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;}
+.pm{background:#fff8e1;color:#f57f17;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;}
+.pl{background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;}
+.act{display:flex;gap:4px;flex-wrap:wrap;}
+.act button{border:none;padding:4px 8px;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;}
+.bv{background:#e3f2fd;color:#1565C0;}
+.br{background:#e8f5e9;color:#2e7d32;}
+.bs2{background:#fff3e0;color:#e65100;}
+.update-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:28px;max-width:520px;}
+.update-card h3{font-family:'Playfair Display',serif;font-size:17px;color:var(--navy);margin-bottom:20px;}
+.success-box{background:#e8f5e9;border:1px solid #c8e6c9;border-radius:8px;padding:14px;color:var(--green);font-size:13px;font-weight:600;display:none;margin-top:14px;}
+.error-box{background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;padding:14px;color:var(--red);font-size:13px;font-weight:600;display:none;margin-top:14px;}
+.filters{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.filters input,.filters select{border:1.5px solid var(--border);background:#fff;padding:7px 12px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:var(--text);outline:none;}
+.filters input{flex:1;min-width:180px;}
+.btn-sm{background:var(--navy);color:#fff;border:none;padding:7px 16px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transform:translateY(10px);transition:all 0.3s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">🎙️</div>
+    <h2>NagrikVaani Admin</h2>
+    <p>Authorized Officers Only</p>
+    <div class="field"><label>Username</label><input type="text" id="uname" placeholder="Enter username" onkeydown="if(event.key==='Enter')login()"></div>
+    <div class="field"><label>Password</label><input type="password" id="upass" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()"></div>
+    <button class="btn" onclick="login()">Login to Admin Panel</button>
+    <div class="error-msg" id="loginErr">Invalid credentials. Please try again.</div>
+    <div class="hint">Demo: admin / nagrik2026</div>
+  </div>
+</div>
+
+<div class="admin-wrap" id="adminWrap">
+  <div class="topbar">
+    <span>Government of India · Ministry of Public Grievances</span>
+    <span id="clock"></span>
+  </div>
+  <div class="navbar">
+    <div><span class="brand">Nagrik<span>Vaani</span></span><span class="abadge">ADMIN</span></div>
+    <div class="nav-right">
+      <a href="index.html">User Portal</a>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sb-label">Menu</div>
+      <button class="sb-item active" id="sb-dash"   onclick="showPage('dash')">📊 Dashboard</button>
+      <button class="sb-item"        id="sb-all"    onclick="showPage('all')">📋 All Complaints</button>
+      <button class="sb-item"        id="sb-update" onclick="showPage('update')">✏️ Update Status</button>
+      <button class="sb-item"        id="sb-open"   onclick="showPage('open')">🔴 Open</button>
+      <button class="sb-item"        id="sb-prog"   onclick="showPage('prog')">🟡 In Progress</button>
+      <button class="sb-item"        id="sb-res"    onclick="showPage('res')">🟢 Resolved</button>
+    </div>
+    <div class="main">
+
+      <div class="page active" id="page-dash">
+        <div class="page-head"><h2>📊 Dashboard</h2><p>Live stats from database</p></div>
+        <div class="stats">
+          <div class="stat">       <div class="stat-num" id="sTotal">—</div><div class="stat-lbl">Total</div></div>
+          <div class="stat orange"><div class="stat-num" id="sOpen">—</div><div class="stat-lbl">Open</div></div>
+          <div class="stat gold">  <div class="stat-num" id="sProg">—</div><div class="stat-lbl">In Progress</div></div>
+          <div class="stat green"> <div class="stat-num" id="sRes">—</div><div class="stat-lbl">Resolved</div></div>
+          <div class="stat red">   <div class="stat-num" id="sDup">—</div><div class="stat-lbl">Duplicates</div></div>
+        </div>
+        <div class="page-head"><h2>Recent Complaints</h2></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Citizen</th><th>Category</th><th>District</th><th>Priority</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody id="dashTbody"><tr><td colspan="8" style="text-align:center;padding:20px">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="page" id="page-all">
+        <div class="page-head"><h2>📋 All Complaints</h2></div>
+        <div class="filters">
+          <input type="text" id="searchBox" placeholder="Search ID, name, district..." oninput="filterAll()">
+          <select id="fStatus" onchange="filterAll()">
+            <option value="">All Status</option>
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <select id="fCat" onchange="filterAll()">
+            <option value="">All Categories</option>
+            <option>Infrastructure</option><option>Electricity</option><option>Water</option>
+            <option>Health</option><option>Education</option><option>Transport</option>
+            <option>Govt Scheme</option><option>Other</option>
+          </select>
+          <button class="btn-sm" onclick="loadAll()">Refresh</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Citizen</th><th>Phone</th><th>Category</th><th>District</th><th>Priority</th><th>Status</th><th>Remarks</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody id="allTbody"><tr><td colspan="10" style="text-align:center;padding:20px">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="page" id="page-update">
+        <div class="page-head"><h2>✏️ Update Complaint Status</h2><p>Update status and add officer remarks</p></div>
+        <div class="update-card">
+          <h3>Update Complaint</h3>
+          <div class="field"><label>Complaint ID</label><input type="text" id="upId" placeholder="e.g. NV-2026-12345" style="text-transform:uppercase"></div>
+          <div class="field">
+            <label>New Status</label>
+            <select id="upStatus">
+              <option value="">-- Select Status --</option>
+              <option value="Registered">Registered</option>
+              <option value="Under Review">Under Review</option>
+              <option value="Assigned">Assigned</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Resolved">Resolved</option>
+              <option value="Closed">Closed</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+          <div class="field"><label>Remarks / Officer Comment</label><textarea id="upRemarks" placeholder="e.g. Pothole repaired by PWD team on 30 March."></textarea></div>
+          <button class="btn" onclick="doUpdate()" id="upBtn">Save Update</button>
+          <div class="success-box" id="upSuccess"></div>
+          <div class="error-box"   id="upError"></div>
+        </div>
+      </div>
+
+      <div class="page" id="page-open">
+        <div class="page-head"><h2>🔴 Open Complaints</h2></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Citizen</th><th>Category</th><th>District</th><th>Priority</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody id="openTbody"><tr><td colspan="7" style="text-align:center;padding:20px">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="page" id="page-prog">
+        <div class="page-head"><h2>🟡 In Progress</h2></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Citizen</th><th>Category</th><th>District</th><th>Priority</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody id="progTbody"><tr><td colspan="7" style="text-align:center;padding:20px">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="page" id="page-res">
+        <div class="page-head"><h2>🟢 Resolved Complaints</h2></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Citizen</th><th>Category</th><th>District</th><th>Priority</th><th>Date</th><th>Remarks</th></tr></thead>
+            <tbody id="resTbody"><tr><td colspan="7" style="text-align:center;padding:20px">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var API = 'http://localhost:3001/api';
+var allData = [];
+
+function login() {
+  var u = document.getElementById('uname').value.trim();
+  var p = document.getElementById('upass').value.trim();
+  if (u === 'admin' && p === 'nagrik2026') {
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('adminWrap').style.display = 'block';
+    initAdmin();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    document.getElementById('upass').value = '';
+  }
+}
+
+function logout() {
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('adminWrap').style.display = 'none';
+  document.getElementById('uname').value = '';
+  document.getElementById('upass').value = '';
+}
+
+function initAdmin() {
+  setInterval(function() {
+    document.getElementById('clock').textContent = new Date().toLocaleString('en-IN');
+  }, 1000);
+  loadStats();
+  loadAll();
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.sb-item').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('sb-' + name).classList.add('active');
+  if (name === 'open') renderFiltered('open', 'openTbody');
+  if (name === 'prog') renderFiltered('in_progress', 'progTbody');
+  if (name === 'res')  renderFiltered('resolved', 'resTbody');
+}
+
+function loadStats() {
+  fetch(API + '/admin/stats')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.success) {
+        document.getElementById('sTotal').textContent = d.stats.total || 0;
+        document.getElementById('sOpen').textContent  = d.stats.open_count || 0;
+        document.getElementById('sProg').textContent  = d.stats.in_progress || 0;
+        document.getElementById('sRes').textContent   = d.stats.resolved || 0;
+        document.getElementById('sDup').textContent   = d.stats.duplicates || 0;
+      }
+    }).catch(function() {});
+}
+
+function loadAll() {
+  fetch(API + '/admin/complaints?limit=200')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.success && d.complaints) {
+        allData = d.complaints;
+        buildTable(allData.slice(0, 10), 'dashTbody', 'dash');
+        buildTable(allData, 'allTbody', 'all');
+      } else {
+        setErr('dashTbody', 8, 'API Error: ' + (d.error || 'unknown'));
+        setErr('allTbody', 10, 'API Error: ' + (d.error || 'unknown'));
+      }
+    }).catch(function(e) {
+      setErr('dashTbody', 8, 'Cannot connect. Is node server.js running?');
+      setErr('allTbody', 10, 'Cannot connect. Is node server.js running?');
+    });
+}
+
+function setErr(id, cols, msg) {
+  document.getElementById(id).innerHTML = '<tr><td colspan="' + cols + '" style="text-align:center;padding:20px;color:#c62828;">' + msg + '</td></tr>';
+}
+
+function filterAll() {
+  var s = document.getElementById('searchBox').value.toLowerCase();
+  var st = document.getElementById('fStatus').value;
+  var ct = document.getElementById('fCat').value;
+  var r = allData.filter(function(c) {
+    return (!s  || c.complaint_id.toLowerCase().indexOf(s) > -1 || c.citizen_name.toLowerCase().indexOf(s) > -1 || (c.district||'').toLowerCase().indexOf(s) > -1) &&
+           (!st || c.status === st) &&
+           (!ct || c.category === ct);
+  });
+  buildTable(r, 'allTbody', 'all');
+}
+
+function renderFiltered(status, tbodyId) {
+  var r = allData.filter(function(c) { return c.status === status; });
+  buildTable(r, tbodyId, 'simple');
+}
+
+function priClass(p) { return p === 'High' ? 'ph' : p === 'Low' ? 'pl' : 'pm'; }
+function statusClass(s) { return s === 'open' ? 's-open' : s === 'in_progress' ? 's-prog' : s === 'resolved' ? 's-res' : 's-rej'; }
+function statusLabel(s) { return s === 'open' ? 'Open' : s === 'in_progress' ? 'In Progress' : s === 'resolved' ? 'Resolved' : 'Rejected'; }
+
+function buildTable(list, tbodyId, mode) {
+  var tb = document.getElementById(tbodyId);
+  var cols = mode === 'all' ? 10 : mode === 'res' ? 7 : 8;
+  if (!list || list.length === 0) {
+    tb.innerHTML = '<tr><td colspan="' + cols + '" style="text-align:center;padding:30px;color:#5a6a85;">No complaints found.</td></tr>';
+    return;
+  }
+  var h = '';
+  for (var i = 0; i < list.length; i++) {
+    var c = list[i];
+    var id = c.complaint_id;
+    var sc = statusClass(c.status);
+    var sl = statusLabel(c.status);
+    var pc = priClass(c.priority);
+    var dt = new Date(c.submitted_at).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
+    var rmk = c.remarks ? (c.remarks.length > 35 ? c.remarks.substring(0,35) + '...' : c.remarks) : '-';
+    var cat = (c.category_icon || '') + ' ' + c.category;
+    var dis = c.district || '-';
+
+    if (mode === 'res') {
+      h += '<tr><td><span class="cid">' + id + '</span></td><td>' + c.citizen_name + '</td><td>' + cat + '</td><td>' + dis + '</td><td><span class="' + pc + '">' + (c.priority||'Medium') + '</span></td><td>' + dt + '</td><td>' + rmk + '</td></tr>';
+    } else {
+      var acts = '<button class="act bv" onclick="fillUpdate(\'' + id + '\')">Update</button>';
+      if (c.status === 'open') acts += '<button class="act bs2" onclick="quickSet(\'' + id + '\',\'In Progress\')">Start</button>';
+      if (c.status !== 'resolved' && c.status !== 'rejected') acts += '<button class="act br" onclick="quickSet(\'' + id + '\',\'Resolved\')">Resolve</button>';
+
+      if (mode === 'all') {
+        h += '<tr><td><span class="cid" onclick="fillUpdate(\'' + id + '\')">' + id + '</span></td>';
+        h += '<td>' + c.citizen_name + '</td><td>' + c.phone + '</td><td>' + cat + '</td><td>' + dis + '</td>';
+        h += '<td><span class="' + pc + '">' + (c.priority||'Medium') + '</span></td>';
+        h += '<td><span class="bs ' + sc + '">' + sl + '</span></td>';
+        h += '<td>' + rmk + '</td><td>' + dt + '</td>';
+        h += '<td><div class="act">' + acts + '</div></td></tr>';
+      } else {
+        h += '<tr><td><span class="cid" onclick="fillUpdate(\'' + id + '\')">' + id + '</span></td>';
+        h += '<td>' + c.citizen_name + '</td><td>' + cat + '</td><td>' + dis + '</td>';
+        h += '<td><span class="' + pc + '">' + (c.priority||'Medium') + '</span></td>';
+        h += '<td><span class="bs ' + sc + '">' + sl + '</span></td>';
+        h += '<td>' + dt + '</td>';
+        h += '<td><div class="act">' + acts + '</div></td></tr>';
+      }
+    }
+  }
+  tb.innerHTML = h;
+}
+
+function fillUpdate(id) {
+  document.getElementById('upId').value = id;
+  document.getElementById('upSuccess').style.display = 'none';
+  document.getElementById('upError').style.display = 'none';
+  showPage('update');
+}
+
+function quickSet(id, status) {
+  fillUpdate(id);
+  document.getElementById('upStatus').value = status;
+  toast('Fill in remarks and click Save Update');
+}
+
+function doUpdate() {
+  var id  = document.getElementById('upId').value.trim().toUpperCase();
+  var st  = document.getElementById('upStatus').value;
+  var rmk = document.getElementById('upRemarks').value.trim();
+  document.getElementById('upSuccess').style.display = 'none';
+  document.getElementById('upError').style.display = 'none';
+  if (!id)  { document.getElementById('upError').textContent = 'Please enter a Complaint ID.'; document.getElementById('upError').style.display = 'block'; return; }
+  if (!st)  { document.getElementById('upError').textContent = 'Please select a status.';     document.getElementById('upError').style.display = 'block'; return; }
+  var btn = document.getElementById('upBtn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  fetch(API + '/admin/update-status', {
+    method: 'PUT',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({complaint_id: id, status: st, remarks: rmk})
+  }).then(function(r) { return r.json(); })
+  .then(function(d) {
+    btn.textContent = 'Save Update'; btn.disabled = false;
+    if (d.success) {
+      document.getElementById('upSuccess').textContent = d.message;
+      document.getElementById('upSuccess').style.display = 'block';
+      document.getElementById('upId').value = '';
+      document.getElementById('upStatus').value = '';
+      document.getElementById('upRemarks').value = '';
+      toast('Complaint updated!');
+      loadStats(); loadAll();
+    } else {
+      document.getElementById('upError').textContent = d.error;
+      document.getElementById('upError').style.display = 'block';
+    }
+  }).catch(function(e) {
+    btn.textContent = 'Save Update'; btn.disabled = false;
+    document.getElementById('upError').textContent = 'Server error: ' + e.message;
+    document.getElementById('upError').style.display = 'block';
+  });
+}
+
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 3500);
+}
+</script>
+</body>
+</html>
